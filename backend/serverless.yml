@@ -1,0 +1,77 @@
+# Configurar credenciais aws https://www.serverless.com/framework/docs/providers/aws/cli-reference/config-credentials
+
+service: dowhile2021-iot
+useDotenv: true
+provider:
+  name: aws
+  runtime: nodejs14.x
+  timeout: 30
+  memorySize: 512
+  stage: ${opt:stage, "${env:stage, 'test'}"} # default test
+  region: ${opt:region, "${env:region, 'us-east-2'}"} # default Ohio
+  apiGateway:
+    restApiId: 
+        Ref: ApiGatewayRestApi
+    restApiRootResourceId:
+      Fn::GetAtt: [ApiGatewayRestApi, RootResourceId]
+  lambdaHashingVersion: '20201221'
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:CreateTable
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:ListStreams
+          Resource: 'arn:aws:dynamodb:${aws:region}:${aws:accountId}:*'
+        - Effect: Allow
+          Action:
+            - iot:*
+          Resource: '*'
+  environment:
+    STAGE: ${self:provider.stage}
+plugins:
+  - serverless-offline
+custom:
+  serverless-offline:
+    httpPort: 4005
+    lambdaPort: 3005
+    stage: local
+functions:
+  receiveTemperature:
+    handler: src/handlers/receiveTemperature.handler
+    events:
+      - iot:
+          sql: "SELECT *, topic(3) as clientId FROM 'sensor/set-temperature/+'"
+  list:
+    handler: src/handlers/list.handler
+    events:
+      - http:
+          path: list
+          method: get
+          cors:
+            origin: '*'
+            headers: '*'
+  postStatus:
+    handler: src/handlers/postStatus.handler
+    events:
+      - http:
+          path: status
+          method: post
+          cors:
+            origin: '*'
+            headers: '*'
+
+resources:
+  Resources:
+    ApiGatewayRestApi:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Name: dowhile2021-iot
+        MinimumCompressionSize: 1024
