@@ -5,10 +5,9 @@
 
 #
 ## Dependências
-[NodeJs versão 14](https://nodejs.org/en/)
-#
-## Instalação
-yarn
+- [NodeJs versão 14](https://nodejs.org/en/)
+
+- yarn
 ```bash
 npm install --global yarn
 ```
