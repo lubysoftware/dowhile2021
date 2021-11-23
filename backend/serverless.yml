@@ -1,6 +1,4 @@
-# Configurar credenciais aws https://www.serverless.com/framework/docs/providers/aws/cli-reference/config-credentials
-
-service: dowhile2021-iot
+service: luby-dowhile2021-iot
 useDotenv: true
 provider:
   name: aws
@@ -36,13 +34,6 @@ provider:
           Resource: '*'
   environment:
     STAGE: ${self:provider.stage}
-plugins:
-  - serverless-offline
-custom:
-  serverless-offline:
-    httpPort: 4005
-    lambdaPort: 3005
-    stage: local
 functions:
   receiveTemperature:
     handler: src/handlers/receiveTemperature.handler
@@ -73,5 +64,5 @@ resources:
     ApiGatewayRestApi:
       Type: AWS::ApiGateway::RestApi
       Properties:
-        Name: dowhile2021-iot
+        Name: ${self:service}
         MinimumCompressionSize: 1024

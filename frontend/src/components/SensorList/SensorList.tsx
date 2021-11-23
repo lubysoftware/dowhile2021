@@ -19,7 +19,6 @@ export default class SensorList extends React.Component<{}, {
   list () {
     axios.get(`${process.env.REACT_APP_API_GATEWAY_URL}/list`)
       .then(res => {
-        console.log(res)
         const items = res.data;
         this.setState({ items });
         setTimeout(() => this.list(), 2000)
